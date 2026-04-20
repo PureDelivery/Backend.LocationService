@@ -9,6 +9,6 @@ namespace PureDelivery.Location.Core.Contracts
 {
     public interface IDeliveryZoneValidator
     {
-        bool IsPointInDeliveryZone(decimal userLat, decimal userLng, List<ZonePointData> zonePoints);
+        bool IsPointInDeliveryZone(double userLat, double userLng, List<ZonePointData> zonePoints);
     }
 }

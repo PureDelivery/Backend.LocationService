@@ -10,7 +10,7 @@ namespace PureDelivery.Location.App.Services
 {
     public class DeliveryZoneValidator : IDeliveryZoneValidator
     {
-        public bool IsPointInDeliveryZone(decimal userLat, decimal userLng, List<ZonePointData> zonePoints)
+        public bool IsPointInDeliveryZone(double userLat, double userLng, List<ZonePointData> zonePoints)
         {
             if (zonePoints == null || zonePoints.Count < 3)
                 return false;
@@ -19,13 +19,10 @@ namespace PureDelivery.Location.App.Services
             return IsPointInPolygon(userLat, userLng, orderedPoints);
         }
 
-        private bool IsPointInPolygon(decimal pointLat, decimal pointLng, List<ZonePointData> polygonPoints)
+        private bool IsPointInPolygon(double pointLat, double pointLng, List<ZonePointData> polygonPoints)
         {
-            var x = (double)pointLat;
-            var y = (double)pointLng;
-            var polygon = polygonPoints.Select(p => new PointD((double)p.Latitude, (double)p.Longitude)).ToArray();
-
-            return IsPointInPolygon(x, y, polygon);
+            var polygon = polygonPoints.Select(p => new PointD(p.Latitude, p.Longitude)).ToArray();
+            return IsPointInPolygon(pointLat, pointLng, polygon);
         }
 
         private bool IsPointInPolygon(double x, double y, PointD[] polygon)
