@@ -1,9 +1,13 @@
 using PureDelivery.Location.App.Services;
 using PureDelivery.Location.Core.Contracts;
+using PureDelivery.LocationService.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.Configure<CourierRadiusConfig>(
+    builder.Configuration.GetSection("CourierRadiusKm"));
+
 builder.Services.AddScoped<IDistanceCalculator, DistanceCalculator>();
 builder.Services.AddScoped<IDeliveryZoneValidator, DeliveryZoneValidator>();
 builder.Services.AddScoped<RestaurantLocationProcessor>();
@@ -28,7 +32,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "PureDelivery Identity Service API",
         Version = "v1",
-        Description = "API для управления клиентами и аутентификацией",
+        Description = "API пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ",
         Contact = new()
         {
             Name = "PureDelivery Team",

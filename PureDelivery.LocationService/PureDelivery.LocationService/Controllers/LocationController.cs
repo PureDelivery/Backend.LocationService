@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using PureDelivery.Location.App.Exceptions;
 using PureDelivery.Location.Core.Contracts;
+using PureDelivery.LocationService.Configuration;
+using PureDelivery.Shared.Contracts.Domain.Enums;
 using PureDelivery.Shared.Contracts.Domain.Models;
 using PureDelivery.Shared.Contracts.DTOs.Location.Requests;
 using PureDelivery.Shared.Contracts.DTOs.Location.Responses;
@@ -14,15 +17,21 @@ namespace PureDelivery.Location.Api.Controllers
     {
         private readonly ILocationService _locationService;
         private readonly IDeliveryZoneValidator _zoneValidator;
+        private readonly IDistanceCalculator _distanceCalculator;
+        private readonly CourierRadiusConfig _radiusConfig;
         private readonly ILogger<LocationController> _logger;
 
         public LocationController(
             ILocationService locationService,
             IDeliveryZoneValidator zoneValidator,
+            IDistanceCalculator distanceCalculator,
+            IOptions<CourierRadiusConfig> radiusConfig,
             ILogger<LocationController> logger)
         {
             _locationService = locationService;
             _zoneValidator = zoneValidator;
+            _distanceCalculator = distanceCalculator;
+            _radiusConfig = radiusConfig.Value;
             _logger = logger;
         }
 
@@ -98,8 +107,59 @@ namespace PureDelivery.Location.Api.Controllers
                 return StatusCode(500, BaseResponse<FilterRestaurantsByLocationResponse>.Failure("Internal server error"));
             }
         }
-    }
 
+
+        [HttpPost("couriers-in-range")]
+        public ActionResult<BaseResponse<CouriersInRangeResponse>> GetCouriersInRange(
+            [FromBody] CouriersInRangeRequest request)
+        {
+            try
+            {
+                var restaurantToDelivery = _distanceCalculator.CalculateDistance(
+                    request.RestaurantLatitude, request.RestaurantLongitude,
+                    request.DeliveryLatitude, request.DeliveryLongitude);
+
+                var eligibleCouriers = request.Couriers
+                    .Where(c => restaurantToDelivery <= GetRadiusKm(c.VehicleType));
+
+                var result = new List<string>();
+
+                foreach (var courier in eligibleCouriers)
+                {
+                    var radius = GetRadiusKm(courier.VehicleType);
+
+                    var courierToRestaurant = _distanceCalculator.CalculateDistance(
+                        courier.Latitude, courier.Longitude,
+                        request.RestaurantLatitude, request.RestaurantLongitude);
+
+                    if (courierToRestaurant <= radius)
+                        result.Add(courier.CourierUserId);
+                }
+
+                _logger.LogInformation(
+                    "couriers-in-range: restaurantToDelivery={D}km, {Total} couriers checked, {Match} matched",
+                    restaurantToDelivery, request.Couriers.Count, result.Count);
+
+                return Ok(BaseResponse<CouriersInRangeResponse>.Success(
+                    new CouriersInRangeResponse { CourierUserIds = result }));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error calculating couriers in range");
+                return StatusCode(500, BaseResponse<CouriersInRangeResponse>.Failure("Internal server error"));
+            }
+        }
+
+        private decimal GetRadiusKm(VehicleType vehicleType) => vehicleType switch
+        {
+            VehicleType.OnFoot => _radiusConfig.OnFoot,
+            VehicleType.Bicycle => _radiusConfig.Bicycle,
+            VehicleType.Scooter => _radiusConfig.Scooter,
+            VehicleType.Motorcycle => _radiusConfig.Motorcycle,
+            VehicleType.Car => _radiusConfig.Car,
+            _ => _radiusConfig.Scooter
+        };
+    }
 
     public class CheckPointInZoneRequest
     {
