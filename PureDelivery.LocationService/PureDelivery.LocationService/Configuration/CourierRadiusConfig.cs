@@ -2,9 +2,9 @@ namespace PureDelivery.LocationService.Configuration;
 
 public class CourierRadiusConfig
 {
-    public decimal OnFoot     { get; set; } = 1.5m;
-    public decimal Bicycle    { get; set; } = 3.0m;
-    public decimal Scooter    { get; set; } = 5.0m;
-    public decimal Motorcycle { get; set; } = 8.0m;
-    public decimal Car        { get; set; } = 12.0m;
+    public double OnFoot     { get; set; } = 1.5;
+    public double Bicycle    { get; set; } = 3.0;
+    public double Scooter    { get; set; } = 5.0;
+    public double Motorcycle { get; set; } = 8.0;
+    public double Car        { get; set; } = 12.0;
 }

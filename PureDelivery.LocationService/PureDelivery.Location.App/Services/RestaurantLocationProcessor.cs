@@ -30,8 +30,8 @@ namespace PureDelivery.Location.App.Services
 
         public RestaurantProcessingResult ProcessRestaurant(
             RestaurantLocationData restaurant,
-            decimal userLat,
-            decimal userLng)
+            double userLat,
+            double userLng)
         {
             try
             {
@@ -97,7 +97,7 @@ namespace PureDelivery.Location.App.Services
             }
         }
 
-        private void ValidateCoordinates(decimal userLat, decimal userLng)
+        private void ValidateCoordinates(double userLat, double userLng)
         {
             if (userLat < -90 || userLat > 90)
             {
@@ -112,8 +112,8 @@ namespace PureDelivery.Location.App.Services
 
         private DeliveryZoneData? FindMatchingDeliveryZone(
             RestaurantLocationData restaurant,
-            decimal userLat,
-            decimal userLng)
+            double userLat,
+            double userLng)
         {
             return restaurant.DeliveryZones
                     .Where(zone => zone.IsActive)
@@ -122,10 +122,10 @@ namespace PureDelivery.Location.App.Services
                     .FirstOrDefault();
         }
 
-        private decimal CalculateDistanceToRestaurant(
+        private double CalculateDistanceToRestaurant(
             RestaurantLocationData restaurant,
-            decimal userLat,
-            decimal userLng)
+            double userLat,
+            double userLng)
         {
             return _distanceCalculator.CalculateDistance(
                 userLat, userLng,

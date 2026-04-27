@@ -11,13 +11,13 @@ namespace PureDelivery.Location.App.Helpers
     {
         public Guid RestaurantId { get; private set; }
         public bool IsDeliverable { get; private set; }
-        public decimal Distance { get; private set; }
+        public double Distance { get; private set; }
         public DeliveryZoneMatch? BestMatchingZone { get; private set; }
 
         private RestaurantProcessingResult(
             Guid restaurantId,
             bool isDeliverable,
-            decimal distance,
+            double distance,
             DeliveryZoneMatch? bestZone)
         {
             RestaurantId = restaurantId;
@@ -28,7 +28,7 @@ namespace PureDelivery.Location.App.Helpers
 
         public static RestaurantProcessingResult Deliverable(
             Guid restaurantId,
-            decimal distance,
+            double distance,
             DeliveryZoneMatch bestZone)
         {
             return new RestaurantProcessingResult(restaurantId, true, distance, bestZone);

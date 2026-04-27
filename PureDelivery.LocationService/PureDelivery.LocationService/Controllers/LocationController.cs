@@ -150,7 +150,7 @@ namespace PureDelivery.Location.Api.Controllers
             }
         }
 
-        private decimal GetRadiusKm(VehicleType vehicleType) => vehicleType switch
+        private double GetRadiusKm(VehicleType vehicleType) => vehicleType switch
         {
             VehicleType.OnFoot => _radiusConfig.OnFoot,
             VehicleType.Bicycle => _radiusConfig.Bicycle,
@@ -165,11 +165,11 @@ namespace PureDelivery.Location.Api.Controllers
     {
         [Required]
         [Range(-90, 90, ErrorMessage = "Latitude must be between -90 and 90")]
-        public decimal UserLatitude { get; set; }
+        public double UserLatitude { get; set; }
 
         [Required]
         [Range(-180, 180, ErrorMessage = "Longitude must be between -180 and 180")]
-        public decimal UserLongitude { get; set; }
+        public double UserLongitude { get; set; }
 
         [Required]
         [MinLength(3, ErrorMessage = "Zone must have at least 3 points")]
@@ -181,8 +181,8 @@ namespace PureDelivery.Location.Api.Controllers
     public class CheckPointInZoneResponse
     {
         public bool IsInZone { get; set; }
-        public decimal UserLatitude { get; set; }
-        public decimal UserLongitude { get; set; }
+        public double UserLatitude { get; set; }
+        public double UserLongitude { get; set; }
         public string ZoneName { get; set; } = string.Empty;
         public string Message => IsInZone
             ? $"Point ({UserLatitude}, {UserLongitude}) is inside {ZoneName}"

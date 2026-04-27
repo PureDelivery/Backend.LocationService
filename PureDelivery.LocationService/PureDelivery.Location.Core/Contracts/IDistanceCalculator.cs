@@ -8,6 +8,6 @@ namespace PureDelivery.Location.Core.Contracts
 {
     public interface IDistanceCalculator
     {
-        decimal CalculateDistance(decimal lat1, decimal lng1, decimal lat2, decimal lng2);
+        double CalculateDistance(double lat1, double lng1, double lat2, double lng2);
     }
 }
